@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:replace="comunes/header :: header(${title})"></div>
+<body>
+<table>
+	<thead>
+		<tr>
+			<th>TIPO DE IDENTIFICACIÓN</th>
+			<th>IDENTIFICACIÓN</th>
+			<th>NOMBRE</th>
+			<th>FECHA DE NACIMIENTO</th>
+			<th>FOTO</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr th:each="deportista : ${ deportistas }">
+			<td th:text="${deportista.tipoIdentificacion.nombre}"></td>
+			<td th:text="${deportista.identificacion}"></td>
+			<td th:text="${deportista.nombre}"></td>
+			<td th:text="${deportista.fechaNacimiento}"></td>
+		</tr>
+	</tbody>
+</table>
+</body>
+</html>
