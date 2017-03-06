@@ -1,25 +1,135 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<div th:replace="comunes/header :: header(${title})"></div>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Inicio Deportistas</title>
+<link rel="stylesheet" th:href="@{/css/bootstrap-theme.min.css}" />
+<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
+<link rel="stylesheet" th:href="@{/css/main.css}" />
+</head>
 <body>
-<table>
-	<thead>
-		<tr>
-			<th>TIPO DE IDENTIFICACI�N</th>
-			<th>IDENTIFICACI�N</th>
-			<th>NOMBRE</th>
-			<th>FECHA DE NACIMIENTO</th>
-			<th>FOTO</th>
-		</tr>
-	</thead>
-	<tbody>
-		<tr th:each="deportista : ${ deportistas }">
-			<td th:text="${deportista.tipoIdentificacion.nombre}"></td>
-			<td th:text="${deportista.identificacion}"></td>
-			<td th:text="${deportista.nombre}"></td>
-			<td th:text="${deportista.fechaNacimiento}"></td>
-		</tr>
-	</tbody>
-</table>
+	<div th:replace="comunes/nav :: navbar"></div>
+	<h1 class="text-center">Deportistas</h1>
+	<div class="container">
+
+		<div class="row">
+			<form class="form-inline" id="formFiltros" th:action="@{/deportistas/filtrar}" th:object="${deportistaFiltro}" method="POST">
+				<div class="form-group">
+					<label for="tipoIdentificacion" class="sr-only">TIPO DE
+						IDENTIFICACIÓN:</label> <select class="form-control campo-form-filtro"
+						id="tipoIdentificacion" th:field="*{tipoIdentificacion}">
+						<option value="">Tipo de identificación</option>
+						<option th:each="tipoIdentificacion : ${tiposIdentificacion}"
+							th:value="${tipoIdentificacion.id}"
+							th:text="${tipoIdentificacion.nombre}"></option>
+					</select>
+				</div>
+
+				<div class="form-group">
+					<label for="identificacion" class="sr-only">IDENTIFICACIÓN:</label>
+					<input type="number" class="form-control campo-form-filtro" id="identificacion"
+						placeholder="Identificación" th:field="*{identificacion}"/>
+				</div>
+
+				<div class="form-group">
+					<label for="nombre" class="sr-only">NOMBRE:</label> <input
+						type="text" class="form-control campo-form-filtro" id="nombre" placeholder="Nombre" th:field="*{nombre}"/>
+				</div>
+
+				<div class="form-group">
+					<label for="fechaNacimiento" class="sr-only">FECHA DE
+						NACIMIENTO:</label> <input type="date" class="form-control campo-form-filtro"
+						id="fechaNacimiento" min="1970-01-01"
+						placeholder="Fecha de nacimiento" th:field="*{fechaNacimiento}" />
+				</div>
+
+				<div class="form-group">
+					<button type="submit" class="btn btn-primary" id="btnConsultar">Consultar</button>
+				</div>
+				<div class="form-group">	
+					<input type="reset" value="Limpiar campos" class="btn btn-default" />
+				</div>
+			</form>
+		</div>
+
+		<div class="row">
+			<div class="col-sm-12">
+				<table class="table">
+					<thead>
+						<tr>
+							<th>TIPO DE IDENTIFICACIÓN</th>
+							<th>IDENTIFICACIÓN</th>
+							<th>NOMBRE</th>
+							<th>FECHA DE NACIMIENTO</th>
+							<th>FOTO</th>
+							<th>OPCIONES</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="deportista : ${ deportistas }">
+							<td th:text="${deportista.tipoIdentificacion.abreviatura}"></td>
+							<td th:text="${deportista.identificacion}"></td>
+							<td th:text="${deportista.nombre}"></td>
+							<td th:text="${deportista.fechaNacimiento}"></td>
+							<td th:text="${deportista.foto}"></td>
+							<td th:text="${deportista.foto}"></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="form-group">
+				<div class="col-sm-2">
+					<select class="form-control pagination" id="pageSizeSelect">
+						<option>Filas por página</option>
+						<option th:each="pageSize : ${pageSizes}" th:text="${pageSize}"
+							th:value="${pageSize}"
+							th:selected="${pageSize} == ${selectedPageSiee}"></option>
+					</select>
+				</div>
+				<div class="col-sm-9">
+					<div
+						th:if="${deportistas != null and deportistas.getTotalPages() != 1}"
+						class="form-group pagination-centered">
+						<ul class="pagination">
+							<li th:class="${deportistas.getNumber() == 0} ? disabled">
+								<!-- 						<a class="pageLink" th:href="@{/deportistas/(pageSize=${selectedPageSize}, page=1)}">&laquo;</a> -->
+								<a class="pageLink"
+								th:href="@{/deportistas/{pageSize}/1(pageSize=${selectedPageSize})}">&laquo;</a>
+							</li>
+							<li th:class="${deportistas.getNumber() == 0} ? disabled"><a
+								class="pageLink"
+								th:href="@{/deportistas/{pageSize}/{page}(pageSize=${selectedPageSize}, page=${deportistas.getNumber()})}">&larr;</a>
+							</li>
+							<li
+								th:class="${deportistas.getNumber() == (page - 1)} ? 'active pointer-disabled'"
+								th:each="page : ${#numbers.sequence(pager.getStartPage(), pager.getEndPage())}">
+								<a class="pageLink"
+								th:href="@{/deportistas/{pageSize}/{page}(pageSize=${selectedPageSize}, page=${page})}"
+								th:text="${page}"></a>
+							</li>
+							<li
+								th:class="${deportistas.getNumber() + 1 == deportistas.getTotalPages()} ? disabled">
+								<a class="pageLink"
+								th:href="@{/deportistas/{pageSize}/{page}(pageSize=${selectedPageSize}, page=${deportistas.getNumber() + 2})}">&rarr;</a>
+							</li>
+							<li
+								th:class="${deportistas.getNumber() + 1 == deportistas.getTotalPages()} ? disabled">
+								<a class="pageLink"
+								th:href="@{/deportistas/{pageSize}/{page}(pageSize=${selectedPageSize}, page=${deportistas.getTotalPages()})}">&raquo;</a>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script th:src="@{/js/jquery-3.1.1.min.js}"></script>
+	<script th:src="@{/js/bootstrap.min.js}"></script>
+	<script th:src="@{/js/main.js}"></script>
 </body>
 </html>

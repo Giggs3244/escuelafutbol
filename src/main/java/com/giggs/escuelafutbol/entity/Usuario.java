@@ -25,7 +25,7 @@ public class Usuario implements Serializable {
 	private String contrasena;
 
 	@Column(nullable = false)
-	private byte estado;
+	private boolean estado;
 
 	// bi-directional many-to-one association to UsuarioRol
 	@OneToMany(mappedBy = "usuario", fetch = FetchType.EAGER)
@@ -50,11 +50,11 @@ public class Usuario implements Serializable {
 		this.contrasena = contrasena;
 	}
 
-	public byte getEstado() {
+	public boolean getEstado() {
 		return this.estado;
 	}
 
-	public void setEstado(byte estado) {
+	public void setEstado(boolean estado) {
 		this.estado = estado;
 	}
 
