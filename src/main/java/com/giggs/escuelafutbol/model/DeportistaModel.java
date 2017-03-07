@@ -2,6 +2,11 @@ package com.giggs.escuelafutbol.model;
 
 import java.util.Date;
 
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
+import org.springframework.format.annotation.DateTimeFormat;
+
 import com.giggs.escuelafutbol.entity.TipoIdentificacion;
 
 public class DeportistaModel {
@@ -18,6 +23,8 @@ public class DeportistaModel {
 
 	private byte estado;
 
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
+	@Temporal(TemporalType.DATE)
 	private Date fechaNacimiento;
 
 	public DeportistaModel() {
@@ -77,6 +84,13 @@ public class DeportistaModel {
 
 	public void setNombre(String nombre) {
 		this.nombre = nombre;
+	}
+
+	@Override
+	public String toString() {
+		return "DeportistaModel [id=" + id + ", foto=" + foto + ", nombre=" + nombre + ", identificacion="
+				+ identificacion + ", tipoIdentificacion=" + tipoIdentificacion + ", estado=" + estado
+				+ ", fechaNacimiento=" + fechaNacimiento + "]";
 	}
 
 }
