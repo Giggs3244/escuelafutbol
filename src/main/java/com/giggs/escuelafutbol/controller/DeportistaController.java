@@ -21,6 +21,7 @@ import com.giggs.escuelafutbol.entity.Deportista;
 import com.giggs.escuelafutbol.entity.TipoIdentificacion;
 import com.giggs.escuelafutbol.model.DeportistaModel;
 import com.giggs.escuelafutbol.model.Pager;
+import com.giggs.escuelafutbol.repository.DeportistaRepositoryPageable;
 import com.giggs.escuelafutbol.repository.TipoIdentificacionRepository;
 import com.giggs.escuelafutbol.service.DeportistaService;
 
@@ -31,6 +32,10 @@ public class DeportistaController {
 	@Autowired
 	@Qualifier("deportistaService")
 	private DeportistaService deportistaService;
+
+	@Autowired
+	@Qualifier("deportistaRepositoryPageable")
+	private DeportistaRepositoryPageable deportistaRepositoryPageable;
 
 	@Autowired
 	@Qualifier("tipoIdentificacionRepository")
@@ -144,6 +149,33 @@ public class DeportistaController {
 		mav.addObject("selectedPageSize", 5);
 		mav.addObject("tiposIdentificacion", tiposIdentificacion);
 		mav.addObject("deportistaModel", new DeportistaModel());
+		mav.addObject("pageSizes", PAGE_SIZES);
+
+		return mav;
+	}
+
+	@GetMapping("/deportistasFiltros")
+	public ModelAndView filtrarDeportistas(@RequestParam("identificacion") String identificacion,
+			@RequestParam(name = "pageSize", required = false) Integer pageSize,
+			@RequestParam(name = "page", required = false) Integer page) {
+		ModelAndView mav = new ModelAndView("deportista/consultar");
+
+		List<TipoIdentificacion> tiposIdentificacion = tipoIdentificacionRepository.findAll();
+		int evalPageSize = pageSize == null ? INITIAL_PAGE_SIZE : pageSize;
+		int evalPage = (page == null || page < 1) ? INITIAL_PAGE : page - 1;
+
+		Page<Deportista> deportistas = deportistaRepositoryPageable.findByIdentificacionLike("%" + identificacion + "%",
+				new PageRequest(evalPage, evalPageSize));
+
+		if (deportistas != null) {
+			Pager pager = new Pager(deportistas.getTotalPages(), deportistas.getNumber(), BUTTONS_TO_SHOW);
+			mav.addObject("deportistas", deportistas);
+			mav.addObject("pager", pager);
+		}
+
+		mav.addObject("selectedPageSize", evalPageSize);
+		mav.addObject("deportistaModel", new DeportistaModel());
+		mav.addObject("tiposIdentificacion", tiposIdentificacion);
 		mav.addObject("pageSizes", PAGE_SIZES);
 
 		return mav;
