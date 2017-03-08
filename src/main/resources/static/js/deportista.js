@@ -33,6 +33,14 @@ function validarCamposFormFiltros() {
 
 function comprobarFiltros() {
 	$(".btnPagination").click(function(evt){
-		validarCamposFormFiltros();
+		console.log(window.location.search);
+		var queryParams = window.location.search;
+		console.log(queryParams.length);
+//		queryParams = queryParams[44] + '2';
+		queryParams = queryParams.replace("page=", "page=2");
+		console.log(queryParams);
+//		window.location.replace(queryParams)
+		evt.preventDefault();
+		//validarCamposFormFiltros();
 	});
 }

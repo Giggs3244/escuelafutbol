@@ -5,7 +5,11 @@ $(document).ready(function() {
 
 function changePageAndSize() {
 	$('#pageSizeSelect').change(function(evt) {
-		window.location.replace("/deportistas/" + this.value + "/1");
+		/* Si el valor de la opcion seleccionada es un numero, se redirecciona. */
+		console.log(evt.target.value);
+		if(this.value !== "") {
+			window.location.replace("/players/inicio/?pageSize=" + this.value + "&page=1");			
+		}
 	});
 }
 

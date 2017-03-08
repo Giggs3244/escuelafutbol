@@ -18,12 +18,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.giggs.escuelafutbol.entity.Deportista;
+import com.giggs.escuelafutbol.entity.QDeportista;
 import com.giggs.escuelafutbol.entity.TipoIdentificacion;
 import com.giggs.escuelafutbol.model.DeportistaModel;
 import com.giggs.escuelafutbol.model.Pager;
 import com.giggs.escuelafutbol.repository.DeportistaRepositoryPageable;
 import com.giggs.escuelafutbol.repository.TipoIdentificacionRepository;
 import com.giggs.escuelafutbol.service.DeportistaService;
+import com.querydsl.core.types.Predicate;
 
 @Controller
 @RequestMapping("/deportistas")
@@ -171,6 +173,44 @@ public class DeportistaController {
 			Pager pager = new Pager(deportistas.getTotalPages(), deportistas.getNumber(), BUTTONS_TO_SHOW);
 			mav.addObject("deportistas", deportistas);
 			mav.addObject("pager", pager);
+		}
+
+		mav.addObject("selectedPageSize", evalPageSize);
+		mav.addObject("deportistaModel", new DeportistaModel());
+		mav.addObject("tiposIdentificacion", tiposIdentificacion);
+		mav.addObject("pageSizes", PAGE_SIZES);
+
+		return mav;
+	}
+
+	@GetMapping("/deportistasFiltrosDos")
+	public ModelAndView filtrarDeportistasDos(@RequestParam("identificacion") String identificacion,
+			@RequestParam("nombre") String nombre, @RequestParam(name = "pageSize", required = false) Integer pageSize,
+			@RequestParam(name = "page", required = false) Integer page) {
+		ModelAndView mav = new ModelAndView("deportista/consultar");
+
+		QDeportista qDeportista = QDeportista.deportista;
+		Predicate predicate = qDeportista.identificacion.like("%" + identificacion + "%")
+				.and(qDeportista.nombre.like("%" + nombre + "%"));
+
+		List<TipoIdentificacion> tiposIdentificacion = tipoIdentificacionRepository.findAll();
+		int evalPageSize = pageSize == null ? INITIAL_PAGE_SIZE : pageSize;
+		int evalPage = (page == null || page < 1) ? INITIAL_PAGE : page - 1;
+
+		Page<Deportista> deportistas = deportistaRepositoryPageable.findAll(predicate,
+				new PageRequest(evalPage, evalPageSize));
+
+		// Page<Deportista> deportistas =
+		// deportistaRepositoryPageable.findByIdentificacionLike("%" +
+		// identificacion + "%",
+		// new PageRequest(evalPage, evalPageSize));
+
+		if (deportistas != null && deportistas.getTotalPages() > 0) {
+			Pager pager = new Pager(deportistas.getTotalPages(), deportistas.getNumber(), BUTTONS_TO_SHOW);
+			mav.addObject("deportistas", deportistas);
+			mav.addObject("pager", pager);
+		} else {
+			mav.addObject("pager", null);
 		}
 
 		mav.addObject("selectedPageSize", evalPageSize);
