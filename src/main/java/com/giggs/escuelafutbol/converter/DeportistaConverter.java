@@ -54,10 +54,7 @@ public class DeportistaConverter {
 		if (entidades != null && entidades.hasContent()) {
 			List<DeportistaModel> modelos = entidades.getContent().stream()
 					.map(entidad -> this.converterEntity2Model(entidad)).collect(Collectors.toList());
-//			modelos.get(0).setTotalPages(entidades.getTotalPages());
-//			modelos.get(0).setNumber(entidades.getNumber());
 			Page<DeportistaModel> pages = new PageImpl<>(modelos, pageable, entidades.getTotalElements());
-//			pages.s
 			return pages;
 		}
 		return null;
